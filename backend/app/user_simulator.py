@@ -11,6 +11,7 @@ def simulate_user(state: EnvState) -> EnvState:
     - engagement
     - diversity
     - fatigue
+    - repetition awareness (NEW)
     """
 
     if not state.feed:
@@ -21,6 +22,12 @@ def simulate_user(state: EnvState) -> EnvState:
     engagement = 0.0
     fatigue = state.user.fatigue
     topics_seen = []
+
+    # -------------------------------
+    # NEW: MEMORY (PREVIOUS TOPICS)
+    # -------------------------------
+    prev_topics = getattr(state, "previous_topics", [])
+    repetition_penalty = 0.0
 
     for item in state.feed:
         topic = item.topics[0]
@@ -42,6 +49,15 @@ def simulate_user(state: EnvState) -> EnvState:
             engagement -= 0.3
             fatigue += 0.1
 
+        # -------------------------------
+        # NEW: REPETITION PENALTY
+        # -------------------------------
+        if topic in prev_topics:
+            repetition_penalty += 0.1
+
+    # APPLY REPETITION PENALTY
+    engagement -= repetition_penalty
+
     # -------------------------------
     # DIVERSITY CALCULATION
     # -------------------------------
@@ -49,7 +65,7 @@ def simulate_user(state: EnvState) -> EnvState:
     diversity_score = unique_topics / len(topics_seen)
 
     # -------------------------------
-    # FATIGUE CONTROL
+    # FATIGUE CONTROL (IMPROVED)
     # -------------------------------
     fatigue = min(fatigue, 1.0)
 
@@ -64,6 +80,11 @@ def simulate_user(state: EnvState) -> EnvState:
     state.engagement = round(max(0.0, engagement), 3)
     state.diversity = round(diversity_score, 3)
     state.user.fatigue = round(fatigue, 3)
+
+    # -------------------------------
+    # NEW: STORE MEMORY
+    # -------------------------------
+    state.previous_topics = topics_seen
 
     return state
 

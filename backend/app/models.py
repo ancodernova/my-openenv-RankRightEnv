@@ -10,6 +10,8 @@ class Signal(BaseModel):
     status: Literal["allowed", "optional", "restricted", "disallowed"]
     requires_consent: bool
     utility: Optional[float] = 0.0
+    cost: float = 0.0
+    noise: float = 0.0
 
 
 # -------------------------------
@@ -104,7 +106,7 @@ class EnvState(BaseModel):
 
     policy_constraints: PolicyConstraints
     hidden_truth: HiddenTruth
-
+    previous_topics: List[str] = []
     engagement: float = 0.0
     diversity: float = 0.0
     violations: int = 0

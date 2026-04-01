@@ -1,3 +1,5 @@
+from operator import truth
+
 from app.models import EnvState
 
 
@@ -83,26 +85,26 @@ def _safety_reward(state: EnvState) -> float:
 # -------------------------------
 # SIGNAL USAGE
 # -------------------------------
-def _signal_reward(state: EnvState) -> float:
+def _signal_reward(state):
     reward = 0.0
-
     truth = state.hidden_truth
+    missing = set(truth.optimal_signals) - set(state.active_signals)
+    reward -= 0.05 * len(missing)
 
-    # reward optimal signals
+    signal_map = {s.name: s for s in state.available_signals}
+
     for signal in state.active_signals:
+
         if signal in truth.optimal_signals:
             reward += 0.05
 
-    # penalize forbidden signals
-    for signal in state.active_signals:
-        if signal in truth.forbidden_signals:
-            reward -= 0.3
+        # cost penalty
+        if signal in signal_map:
+            reward -= signal_map[signal].cost
 
-    # penalize restricted signals if defined
-    restricted = getattr(truth, "restricted_should_not_be_used", [])
-    for signal in state.active_signals:
-        if signal in restricted:
-            reward -= 0.2
+        # forbidden signals
+        if signal in truth.forbidden_signals:
+            reward -= 0.5
 
     return reward
 

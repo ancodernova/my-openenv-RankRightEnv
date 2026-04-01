@@ -48,15 +48,10 @@ class RankRightEnv:
         # -------------------------------
         self._apply_action(action)
 
-        # -------------------------------
-        # APPLY POLICY CHECKS
-        # -------------------------------
-        self.state = check_policy(self.state)
-
-        # -------------------------------
-        # SIMULATE USER RESPONSE
-        # -------------------------------
-        self.state = simulate_user(self.state)
+        # ONLY simulate AFTER ranking (important fix)
+        if self.state.feed:
+            self.state = check_policy(self.state)
+            self.state = simulate_user(self.state)
 
         # -------------------------------
         # COMPUTE REWARD

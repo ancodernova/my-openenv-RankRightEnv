@@ -23,6 +23,6 @@ tasks:
     description: Policy conflict scenario with risky content and restricted signals
 
 metadata:
-  author: YourName
+  author: BugSlayyers
   category: recommendation-governance
   difficulty: progressive

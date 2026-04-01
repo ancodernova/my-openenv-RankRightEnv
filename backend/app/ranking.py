@@ -23,7 +23,7 @@ def rank_content(state: EnvState) -> EnvState:
     scored_items = []
 
     for item in candidates:
-        score = _compute_score(item, state, weights)
+        score = _compute_score(item, state)
         scored_items.append((item, score))
 
     # -------------------------------
@@ -52,19 +52,20 @@ def rank_content(state: EnvState) -> EnvState:
 # -------------------------------
 # SCORE FUNCTION
 # -------------------------------
-def _compute_score(item: ContentItem, state: EnvState, weights: dict) -> float:
+import random
+def _compute_score(item, state):
     relevance = 1.0 if item.topics[0] in state.user.interests else 0.3
     novelty = item.novelty
     safety = 1 - item.risk
 
-    score = (
-        weights["relevance"] * relevance
-        + weights["diversity"] * novelty
-        + weights["safety"] * safety
+    noise = random.uniform(-0.1, 0.1)
+
+    return (
+        state.weights["relevance"] * relevance +
+        state.weights["diversity"] * (novelty * 0.7) +
+        state.weights["safety"] * safety +
+        noise
     )
-
-    return round(score, 4)
-
 
 # -------------------------------
 # DIVERSITY LOGIC
