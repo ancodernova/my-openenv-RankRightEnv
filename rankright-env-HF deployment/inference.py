@@ -4,7 +4,6 @@ import requests
 from openai import OpenAI
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
 
 # -------------------------------
@@ -12,24 +11,22 @@ load_dotenv()
 # -------------------------------
 API_BASE_URL = os.getenv("API_BASE_URL", "https://api.groq.com/openai/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "openai/gpt-oss-120b")
-# Try multiple environment variable names for the API key
-API_KEY = os.getenv("HF_TOKEN") or os.getenv("GROQ_API_KEY") or os.getenv("OPENAI_API_KEY")
 
-if not API_KEY:
-    raise ValueError(
-        "API key not found. Please set one of these environment variables:\n"
-        "  - HF_TOKEN (Hugging Face token)\n"
-        "  - GROQ_API_KEY (Groq API key)\n"
-        "  - OPENAI_API_KEY (OpenAI API key)\n"
-    )
+API_KEY = (
+    os.getenv("HF_TOKEN")
+    or os.getenv("GROQ_API_KEY")
+    or os.getenv("OPENAI_API_KEY")
+)
 
-BASE_URL = "https://aniket-2004-rankright-env.hf.space"
+BASE_URL = os.getenv(
+    "ENV_BASE_URL",
+    "http://localhost:8000"
+)
 
 client = OpenAI(
     api_key=API_KEY,
     base_url=API_BASE_URL
 )
-
 
 # -------------------------------
 # STRICT SYSTEM PROMPT
@@ -44,17 +41,16 @@ STRICT RULES:
 - NO extra text
 
 VALID ACTION TYPES (ONLY USE THESE):
-- 'activate_signals'
-- 'deactivate_signals'
-- 'set_weights'
-- 'rank'
-- 'rerank'
-- 'finalize'
+- activate_signals
+- deactivate_signals
+- set_weights
+- rank
+- finalize
 
 FORMAT EXACTLY:
 {
-  "action_type": "<one of the valid types above>",
-  "params": {}
+  "action_type": "...",
+  "params": {...}
 }
 
 OBJECTIVES:
@@ -68,7 +64,6 @@ SIGNAL RULES:
 - Avoid restricted signals unless absolutely necessary
 """
 
-
 # -------------------------------
 # SAFE LLM CALL (WITH RETRY)
 # -------------------------------
@@ -81,7 +76,7 @@ def get_action_from_llm(observation):
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": json.dumps(observation)}
                 ],
-                temperature=0.2
+                temperature=0.0  # ✅ deterministic
             )
 
             content = response.choices[0].message.content.strip()
@@ -94,7 +89,6 @@ def get_action_from_llm(observation):
             print(f"ERROR attempt={attempt+1} message={str(e)}")
 
     return fallback_action()
-
 
 # -------------------------------
 # SAFE JSON PARSER
@@ -110,19 +104,31 @@ def safe_parse_json(text):
         except:
             return fallback_action()
 
-
 # -------------------------------
-# VALIDATE ACTION STRUCTURE
+# STRICT ACTION VALIDATION
 # -------------------------------
 def validate_action(action):
     if not isinstance(action, dict):
         return False
+
     if "action_type" not in action:
         return False
+
     if "params" not in action:
         return False
-    return True
 
+    allowed_actions = [
+        "activate_signals",
+        "deactivate_signals",
+        "set_weights",
+        "rank",
+        "finalize"
+    ]
+
+    if action["action_type"] not in allowed_actions:
+        return False
+
+    return True
 
 # -------------------------------
 # FALLBACK ACTION
@@ -133,15 +139,19 @@ def fallback_action():
         "params": {}
     }
 
-
 # -------------------------------
 # RUN SINGLE EPISODE
 # -------------------------------
 def run_episode(task_id):
     print(f"START task={task_id}")
 
-    # RESET
     res = requests.post(f"{BASE_URL}/reset", json={"task_id": task_id})
+
+    if res.status_code != 200:
+        print(f"ERROR reset failed status={res.status_code}")
+        print(res.text)
+        return {}
+
     obs = res.json()["observation"]
 
     done = False
@@ -153,32 +163,29 @@ def run_episode(task_id):
         action = get_action_from_llm(obs)
 
         res = requests.post(f"{BASE_URL}/step", json={"action": action})
-        
-        # Debug: Check response status and content
+
         if res.status_code != 200:
-            print(f"ERROR API response status={res.status_code}")
-            print(f"ERROR API response={res.text}")
+            print(f"ERROR step failed status={res.status_code}")
+            print(res.text)
             break
-        
+
         data = res.json()
-        
-        # Debug: Print response if missing expected keys
-        if "observation" not in data or "reward" not in data or "done" not in data:
-            print(f"ERROR API response missing keys: {list(data.keys())}")
-            print(f"ERROR Full response: {data}")
+
+        if not all(k in data for k in ["observation", "reward", "done"]):
+            print(f"ERROR invalid response keys={list(data.keys())}")
             break
 
         obs = data["observation"]
         reward = data["reward"]
         done = data["done"]
 
-        print(f"STEP step={step} action={action} reward={reward}")
+        # ✅ Clean logs
+        print(f"STEP step={step} reward={reward}")
 
         if step > 10:
             print(f"STEP step={step} message=max_steps_reached")
             break
 
-    # FINAL STATE
     state = requests.get(f"{BASE_URL}/state").json()
 
     print(
@@ -190,7 +197,6 @@ def run_episode(task_id):
 
     return state
 
-
 # -------------------------------
 # RUN ALL TASKS
 # -------------------------------
@@ -199,11 +205,11 @@ def run_all():
     results = {}
 
     for t in tasks:
+        print("\n-----------------------------")
         state = run_episode(t)
         results[t] = state
 
     return results
-
 
 # -------------------------------
 # MAIN

@@ -47,12 +47,12 @@ export function useSimulation() {
     }
   }, []);
 
-  const step = useCallback(async (action?: Record<string, unknown>) => {
+  const step = useCallback(async (action_type: string = "rank", params?: Record<string, unknown>) => {
     if (!state || state.done) return null;
     setStepping(true);
     setError(null);
     try {
-      const newState = await stepSimulation(action);
+      const newState = await stepSimulation(action_type, params || {});
       setState(newState);
       return newState;
     } catch (e) {
