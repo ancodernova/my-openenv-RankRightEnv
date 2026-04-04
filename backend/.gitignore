@@ -1,5 +1,0 @@
-# Virtual environment
-myenv/
-
-# Environment variables (secrets)
-.env
