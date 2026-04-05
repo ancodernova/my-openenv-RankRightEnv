@@ -76,7 +76,7 @@ def get_action_from_llm(observation):
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": json.dumps(observation)}
                 ],
-                temperature=0.0  # ✅ deterministic
+                temperature=0.0  # deterministic
             )
 
             content = response.choices[0].message.content.strip()
@@ -179,7 +179,7 @@ def run_episode(task_id):
         reward = data["reward"]
         done = data["done"]
 
-        # ✅ Clean logs
+        # Clean logs
         print(f"STEP step={step} reward={reward}")
 
         if step > 10:

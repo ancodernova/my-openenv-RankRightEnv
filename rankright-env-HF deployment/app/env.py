@@ -110,7 +110,7 @@ class RankRightEnv:
 
         for s in signals:
             if s in allowed_signals:
-                # ❌ skip disallowed signals
+                # skip disallowed signals
                 if allowed_signals[s].status == "disallowed":
                     continue
                 valid_signals.append(s)
