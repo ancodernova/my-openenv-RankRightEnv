@@ -148,7 +148,7 @@ Endpoints:
 ---
 ## HUGGING FACE DEPLOYEMENT
 
-![Demo](images\hf.jpeg)
+![Demo](images/hf.jpeg)
 
 ---
 
@@ -160,7 +160,7 @@ https://meta-hack-delta.vercel.app/
 
 ## DEMO
 
-![Demo](images\demo.png)
+![Demo](images/demo.png)
 
 ## 🏁 Final Note
 
