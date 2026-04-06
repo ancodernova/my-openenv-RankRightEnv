@@ -1,4 +1,4 @@
-# 🚀 RankRightEnv: Policy-Aware Recommendation Governance Environment
+#  RankRightEnv: Policy-Aware Recommendation Governance Environment
 
 
 A simulation environment where AI agents must **optimize recommendations under policy, safety, and diversity constraints**, not just engagement.
@@ -108,7 +108,7 @@ Constraints:
 ---
 
 ## 🎯 Reward Function
-Reward = Engagement + Diversity + Safety - Policy Penalties - Signal Costs
+**Reward = Engagement + Diversity + Safety - Policy Penalties - Signal Costs**
 
 ---
 
@@ -135,7 +135,7 @@ Reward = Engagement + Diversity + Safety - Policy Penalties - Signal Costs
 
 ## 🔌 API
 
-Base URL:
+Hugging Face Deployment URL:
 https://aniket-2004-rankright-env.hf.space
 
 Endpoints:
@@ -143,10 +143,9 @@ Endpoints:
 - POST /reset
 - POST /step
 - GET /state
-- GET /health 
 
 ---
-## HUGGING FACE DEPLOYEMENT
+## Testing with LLM with HF Deployment 
 
 ![Demo](images/hf.jpeg)
 
@@ -171,6 +170,5 @@ It is a simulation of responsible AI decision-making.
 ---
 
 ## DEVELOPERS
-
-### Aniket Atole
+### Aniket Atole 
 ### Vaishnavi Balodhi
