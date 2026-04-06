@@ -145,7 +145,7 @@ Endpoints:
 - GET /state
 
 ---
-## Testing with LLM with HF Deployment 
+## Testing with LLM on HF Deployment 
 
 ![Demo](images/hf.jpeg)
 
