@@ -1,131 +1,174 @@
-# 🚀 RankRightEnv — Policy-Aware Recommendation Governance Environment
+#  RankRightEnv: Policy-Aware Recommendation Governance Environment
 
-## 🌍 Overview
-Modern recommendation systems (Instagram Reels, TikTok, etc.) are not just about engagement anymore. They must balance:
-- User satisfaction
-- Diversity
-- Safety
-- Policy compliance
 
-RankRightEnv is a simulation environment where AI agents learn to make recommendation decisions under real-world constraints.
+A simulation environment where AI agents must **optimize recommendations under policy, safety, and diversity constraints**, not just engagement.
 
 ---
 
-## 💡 Core Idea
-Instead of optimizing only for engagement, we build a **governance-aware recommendation system**.
+## 🚨 Problem
+
+Modern platforms like Instagram, Facebook, and TikTok rely heavily on **engagement-driven recommendation systems**.
+
+While effective for retention, this leads to:
+
+- Echo chambers and filter bubbles  
+- Amplification of sensational or harmful content  
+- Overuse of invasive or sensitive signals  
+- Lack of transparency in decision-making  
+- No explicit enforcement of safety or policy constraints  
+
+> The system optimizes for *“what keeps users hooked”*, not *“what should be responsibly recommended.”*
 
 ---
 
-## 🧠 Problem
-Traditional systems:
-- Create echo chambers
-- Promote addictive/sensational content
-- Ignore governance constraints
+## 🛡️ Mitigation (Our Approach)
+
+RankRightEnv introduces a **policy-aware recommendation framework** where optimization is done under real-world constraints.
+
+Instead of maximizing engagement blindly, agents must:
+
+- Respect **platform policies and signal restrictions**  
+- Maintain **content diversity and fairness**  
+- Avoid **harmful or high-risk recommendations**  
+- Make **trade-offs between engagement, safety, and compliance**  
+
 
 ---
 
-## 🧩 Solution
-We built a simulation environment where an AI agent must:
-- Select signals
-- Rank content
-- Maintain diversity
-- Avoid harmful content
-- Follow policies
+## 🧠 Core Idea
+
+Agents must:
+
+- Select signals  
+- Rank content  
+- Maintain diversity  
+- Avoid harmful content  
+- Follow platform policies  
+
+Focus: **decision-making under constraints**, not just ranking.
 
 ---
 
-## 🏗️ Architecture
 
-reset() → step() → reward → repeat → finalize
+## 💡 Key Insight
 
-Components:
-- Environment Engine
-- Policy Engine
-- Ranking Engine
-- User Simulator
-- Reward System
-- Grader
+> The challenge is not just ranking — but **choosing the right signals under constraints**
 
 ---
 
-## 📊 Observation
-Includes:
-- user profile
-- signals
-- candidates
-- policy constraints
+## 🏗 System Architecture
+reset() → observe → act → step() → reward → repeat → finalize
+
+### Components
+
+- Environment Engine — state management  
+- Policy Engine — constraint enforcement  
+- Ranking Engine — content scoring  
+- User Simulator — behavior modeling  
+- Reward Engine — multi-objective reward  
+- Grader — final score (0 → 1)
 
 ---
 
-## 🎮 Actions
+## 📊 Observation Space
+
+- User profile  
+- Signals (allowed / restricted / disallowed)  
+- Content candidates  
+- Policy constraints  
+
+---
+
+## 🎮 Action Space
+
+```json
+{
+  "action_type": "...",
+  "params": {}
+}
+```
+
+###  Action
+
 - activate_signals
 - deactivate_signals
 - set_weights
 - rank
 - finalize
+---
+
+## ⚖️ Policy & Reward
+
+Constraints:
+
+- Disallowed & restricted signals
+- Diversity requirements
+- Risk thresholds
 
 ---
 
-## ⚖️ Policy
-- disallowed signals blocked
-- diversity enforced
-- risk controlled
+## 🎯 Reward Function
+**Reward = Engagement + Diversity + Safety - Policy Penalties - Signal Costs**
 
 ---
 
-## 🎯 Reward
-Reward = engagement + diversity + safety - penalties
+## 👤 Simulation & Evaluation
+
+### User Simulation:
+- Interest match
+- Fatigue
+- Safety sensitivity
+### Evaluation (0 → 1):
+- Engagement
+- Diversity
+- Safety
+- Policy compliance
 
 ---
 
-## 👤 User Simulation
-Simulates:
-- interest match
-- fatigue
-- safety sensitivity
+## 🧪 Difficulty Levels
+- Easy — clear preferences
+- Medium — noisy signals
+- Hard — high-risk trade-offs
 
 ---
 
-## 📈 Evaluation
-Final score based on:
-- engagement
-- diversity
-- safety
-- policy compliance
+## 🔌 API
+
+Hugging Face Deployment URL:
+https://aniket-2004-rankright-env.hf.space
+
+Endpoints:
+
+- POST /reset
+- POST /step
+- GET /state
+
+---
+## Testing with LLM on HF Deployment 
+
+![Demo](images/hf.jpeg)
 
 ---
 
-## 🧪 API
+## DEPLOYED LINK 
 
-POST /reset  
-POST /step  
-GET /state  
-GET /health  
+https://meta-hack-delta.vercel.app/
 
 ---
 
-## 🤖 Inference
-Uses OpenAI-compatible LLM (Groq backend)
+## DEMO
+
+![Demo](images/demo.png)
+
+## 🏁 Final Note
+
+This is not just a recommender system.
+
+It is a simulation of responsible AI decision-making.
 
 ---
 
-## 🐳 Deployment
-Docker + HuggingFace Spaces
-
----
-
-## 🏆 Innovation
-We shift:
-"What to recommend" → "How to recommend responsibly"
-
----
-
-## 🚀 Future Scope
-- RL training
-- multi-agent simulation
-- explainable AI
-
----
-
-## 👨‍💻 Author
-Meta x PyTorch x Hugging Face Hackathon
+## DEVELOPERS
+### Aniket Atole 
+### Vaishnavi Balodhi
