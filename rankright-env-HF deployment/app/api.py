@@ -1,6 +1,5 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import Dict
+from fastapi import FastAPI, HTTPException, Body
+from typing import Dict, Optional
 
 from app.env import RankRightEnv
 
@@ -8,17 +7,6 @@ from app.env import RankRightEnv
 app = FastAPI(title="RankRightEnv API")
 
 env = RankRightEnv()
-
-
-# -------------------------------
-# REQUEST MODELS
-# -------------------------------
-class ResetRequest(BaseModel):
-    task_id: str
-
-
-class StepRequest(BaseModel):
-    action: Dict
 
 
 # -------------------------------
@@ -30,30 +18,43 @@ def root():
         "message": "RankRightEnv is running",
         "endpoints": ["/reset", "/step", "/state"]
     }
+
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
 
 # -------------------------------
-# RESET
+# RESET (FIXED FOR OPENENV)
 # -------------------------------
 @app.post("/reset")
-def reset(req: ResetRequest):
+def reset(req: Optional[Dict] = Body(default={})):
     try:
-        obs = env.reset(req.task_id)
+        # ✅ allow missing body
+        task_id = req.get("task_id", "easy")
+
+        obs = env.reset(task_id)
+
         return {"observation": obs}
+
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 # -------------------------------
-# STEP
+# STEP (FIXED FOR OPENENV)
 # -------------------------------
 @app.post("/step")
-def step(req: StepRequest):
+def step(req: Optional[Dict] = Body(default={})):
     try:
-        obs, reward, done, info = env.step(req.action)
+        # ✅ allow missing body
+        action = req.get("action", {
+            "action_type": "rank",
+            "params": {}
+        })
+
+        obs, reward, done, info = env.step(action)
 
         return {
             "observation": obs,

@@ -15,12 +15,21 @@ entrypoints:
 tasks:
   - id: easy
     description: Clear user preferences with simple signal selection
+    grader:
+      type: numeric
+      key: score
 
   - id: medium
     description: Ambiguous user intent requiring optional signal reasoning
+    grader:
+      type: numeric
+      key: score
 
   - id: hard
     description: Policy conflict scenario with risky content and restricted signals
+    grader:
+      type: numeric
+      key: score
 
 metadata:
   author: BugSlayyers

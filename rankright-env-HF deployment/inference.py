@@ -28,45 +28,34 @@ client = OpenAI(
     base_url=API_BASE_URL
 )
 
-# -------------------------------
-# STRICT SYSTEM PROMPT
-# -------------------------------
 SYSTEM_PROMPT = """
 You are a policy-aware recommendation agent.
-
 STRICT RULES:
 - Output ONLY valid JSON
 - NO explanations
 - NO markdown
 - NO extra text
-
 VALID ACTION TYPES (ONLY USE THESE):
 - activate_signals
 - deactivate_signals
 - set_weights
 - rank
 - finalize
-
 FORMAT EXACTLY:
 {
   "action_type": "...",
   "params": {...}
 }
-
 OBJECTIVES:
 - maximize engagement
 - maintain diversity
 - avoid risky content
 - follow policy constraints strictly
-
 SIGNAL RULES:
 - NEVER use disallowed signals
 - Avoid restricted signals unless absolutely necessary
 """
 
-# -------------------------------
-# SAFE LLM CALL (WITH RETRY)
-# -------------------------------
 def get_action_from_llm(observation):
     for attempt in range(3):
         try:
@@ -76,7 +65,7 @@ def get_action_from_llm(observation):
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": json.dumps(observation)}
                 ],
-                temperature=0.0  # ✅ deterministic
+                temperature=0.0
             )
 
             content = response.choices[0].message.content.strip()
@@ -90,9 +79,6 @@ def get_action_from_llm(observation):
 
     return fallback_action()
 
-# -------------------------------
-# SAFE JSON PARSER
-# -------------------------------
 def safe_parse_json(text):
     try:
         return json.loads(text)
@@ -104,9 +90,6 @@ def safe_parse_json(text):
         except:
             return fallback_action()
 
-# -------------------------------
-# STRICT ACTION VALIDATION
-# -------------------------------
 def validate_action(action):
     if not isinstance(action, dict):
         return False
@@ -130,9 +113,6 @@ def validate_action(action):
 
     return True
 
-# -------------------------------
-# FALLBACK ACTION
-# -------------------------------
 def fallback_action():
     return {
         "action_type": "rank",
@@ -143,7 +123,7 @@ def fallback_action():
 # RUN SINGLE EPISODE
 # -------------------------------
 def run_episode(task_id):
-    print(f"START task={task_id}")
+    print(f"[START] task={task_id}", flush=True)  # ✅ FIX
 
     res = requests.post(f"{BASE_URL}/reset", json={"task_id": task_id})
 
@@ -179,27 +159,25 @@ def run_episode(task_id):
         reward = data["reward"]
         done = data["done"]
 
-        # ✅ Clean logs
-        print(f"STEP step={step} reward={reward}")
+        print(f"[STEP] step={step} reward={reward}", flush=True)  # ✅ FIX
 
         if step > 10:
-            print(f"STEP step={step} message=max_steps_reached")
+            print(f"[STEP] step={step} message=max_steps_reached", flush=True)
             break
 
     state = requests.get(f"{BASE_URL}/state").json()
 
-    print(
-        f"END task={task_id} "
-        f"engagement={state.get('engagement')} "
-        f"diversity={state.get('diversity')} "
-        f"violations={state.get('violations')}"
-    )
+    # ✅ FIX: ADD SCORE
+    engagement = state.get("engagement", 0)
+    diversity = state.get("diversity", 0)
+    score = (engagement + diversity) / 2
+    score = max(0.01, min(0.99, score))  # ensure strict range
+
+    print(f"[END] task={task_id} score={round(score,3)}", flush=True)  # ✅ FIX
 
     return state
 
-# -------------------------------
-# RUN ALL TASKS
-# -------------------------------
+
 def run_all():
     tasks = ["easy", "medium", "hard"]
     results = {}
@@ -211,8 +189,6 @@ def run_all():
 
     return results
 
-# -------------------------------
-# MAIN
-# -------------------------------
+
 if __name__ == "__main__":
     run_all()
