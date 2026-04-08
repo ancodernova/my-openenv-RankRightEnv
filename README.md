@@ -304,7 +304,7 @@ Captures real-world failure modes:
 | Name | Role |
 |---|---|
 | **Aniket Atole** | Backend Developer and Deployment |
-| **Vaishnavi Balodhi** | Frontend Developer, Deployment and System Design  |
+| **Vaishnavi Balodhi** | Frontend Developer and System Design  |
 
 *Built for the Meta × PyTorch × Hugging Face Hackathon*
 
